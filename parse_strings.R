@@ -1,14 +1,24 @@
 data <- fathers_2023_12_29
 
 data <- data %>%
-  mutate(relationship_length = ifelse(relationship_length == "5mounths5year", "5 years 5 months", relationship_length))
+  mutate(
+    relationship_length = ifelse(
+      relationship_length == "5mounths5year",
+      "5 years 5 months",
+      ifelse(
+        relationship_length == "1oyrs4months",
+        "1 year 4 months",
+        relationship_length  # Return the original value if no condition is met
+      )
+    )
+  )
 
 string_to_months <- function(input_string) {
   numeric_values <- str_extract_all(input_string, "\\d+") %>% 
     unlist() %>% 
     as.integer()
   
-  if (grepl("years", input_string) && grepl("months", input_string)) {
+  if (grepl("years|yrs|ys|oyrs|yr|year", input_string) && grepl("months|month", input_string)) {
     # If both "years" and "months" are present, perform the usual calculation
     months_in_years <- as.double(numeric_values[1] * 12)  # Ensure result is a double
     total_months <- if (!is.na(numeric_values[2])) months_in_years + numeric_values[2] else months_in_years
